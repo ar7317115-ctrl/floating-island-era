@@ -1,0 +1,12 @@
+[
+  {"id":"luban","name":"鲁班","era":"中国古代","role":"工程师","rarity":"传说","skill":"百工之祖","jobBonus":{"builder":0.35},"weakness":"不擅长战斗"},
+  {"id":"libing","name":"李冰","era":"中国古代","role":"水利师","rarity":"传说","skill":"治水","jobBonus":{"water":0.30},"weakness":"远征能力一般"},
+  {"id":"xuxiake","name":"徐霞客","era":"中国古代","role":"探索者","rarity":"史诗","skill":"万里行","jobBonus":{"explorer":0.40},"weakness":"正面战斗一般"},
+  {"id":"huatuo","name":"华佗","era":"中国古代","role":"医师","rarity":"传说","skill":"青囊","jobBonus":{"medic":0.45},"weakness":"生产效率一般"},
+  {"id":"zuchongzhi","name":"祖冲之","era":"中国古代","role":"数学家","rarity":"史诗","skill":"精算","jobBonus":{"research":0.25},"weakness":"生存技能一般"},
+  {"id":"zhaoyun","name":"赵云","era":"三国","role":"护卫","rarity":"传说","skill":"救主","jobBonus":{"guard":0.45},"weakness":"生产专长较少"},
+  {"id":"zhugeliang","name":"诸葛亮","era":"三国","role":"战略家","rarity":"神话","skill":"筹谋","jobBonus":{"research":0.30,"guard":0.20},"weakness":"体力恢复较慢"},
+  {"id":"archimedes","name":"阿基米德","era":"古希腊","role":"机械学家","rarity":"神话","skill":"杠杆与浮力","jobBonus":{"builder":0.30,"research":0.30},"weakness":"不适合高强度战斗"},
+  {"id":"davinci","name":"达·芬奇","era":"文艺复兴","role":"发明家","rarity":"神话","skill":"跨域灵感","jobBonus":{"builder":0.25,"research":0.35},"weakness":"项目过多时效率下降"},
+  {"id":"faraday","name":"法拉第","era":"近代英国","role":"实验科学家","rarity":"传说","skill":"电磁感应","jobBonus":{"research":0.40},"weakness":"早期文明加成有限"}
+]
