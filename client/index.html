@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>浮岛时代 V0.1</title>
+  <title>浮岛时代 V0.2</title>
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
@@ -11,7 +11,7 @@
   <main class="shell">
     <header>
       <div>
-        <p class="eyebrow">FLOATING ISLAND ERA · V0.1</p>
+        <p class="eyebrow">FLOATING ISLAND ERA · V0.2</p>
         <h1>浮岛时代</h1>
         <p class="subtitle">一根鱼竿，从一座小岛，钓出一个文明。</p>
       </div>
@@ -19,21 +19,16 @@
     </header>
 
     <section class="hero card">
-      <div class="island-visual">
-        <div class="fog fog-a"></div>
-        <div class="fog fog-b"></div>
-        <div class="island">
-          <div class="grass"></div>
-          <div class="rock"></div>
-        </div>
+      <div class="world-wrap">
+        <div id="world" class="world"></div>
+        <div class="legend">🟩 已知土地　🌫 未知区域　👤 人物　👾 怪物</div>
       </div>
       <div class="hero-copy">
         <span class="tag">当前目标</span>
-        <h2>活下去。</h2>
-        <p>食物和淡水会持续消耗。你拥有的每一个人物，既是力量，也是新的生存负担。</p>
+        <h2>活下去，然后看见更远的地方。</h2>
+        <p>食物和淡水会持续消耗。人物可以被分配工作，怪物也会真实存在并发动袭击。</p>
         <div class="protection">
-          <span>新手保护</span>
-          <strong id="protectionLabel">—</strong>
+          <span>新手保护</span><strong id="protectionLabel">—</strong>
           <div class="bar"><i id="protectionBar"></i></div>
         </div>
       </div>
@@ -43,23 +38,15 @@
 
     <section class="grid">
       <article class="card actions">
-        <div class="section-title">
-          <div>
-            <span class="tag">核心行动</span>
-            <h3>钓取世界</h3>
-          </div>
-        </div>
+        <span class="tag">核心行动</span>
+        <h3>生存与建设</h3>
         <button class="primary big" data-action="fish">🎣 抛下一竿</button>
-        <p class="hint">前几竿受隐藏新手保护，确保你拥有最基础的生存条件。</p>
-
+        <p class="hint">前几次钓鱼有隐藏保护。后面开始真正面对随机性与风险。</p>
         <div class="button-grid">
           <button data-action="expand">🟫 土方扩岛</button>
           <button data-action="build/hut">🏠 建简易住所</button>
           <button data-action="build/farm">🌾 建小型农田</button>
           <button data-action="build/storage">📦 建储存棚</button>
-        </div>
-
-        <div class="button-grid">
           <button data-action="open-character">👤 开人物箱</button>
           <button data-action="open-mystery">❓ 开未知箱</button>
         </div>
@@ -67,12 +54,24 @@
 
       <article class="card">
         <span class="tag">文明状态</span>
-        <h3>浮岛与人口</h3>
+        <h3>资源与设施</h3>
         <div id="civilization" class="civilization"></div>
-        <div id="characters" class="characters"></div>
       </article>
 
-      <article class="card log-card">
+      <article class="card">
+        <span class="tag">人物系统</span>
+        <h3>术业有专攻</h3>
+        <div id="characters" class="characters"></div>
+      </article>
+    </section>
+
+    <section class="grid lower">
+      <article class="card">
+        <span class="tag">威胁</span>
+        <h3>岛上怪物</h3>
+        <div id="monsters"></div>
+      </article>
+      <article class="card log-card wide">
         <span class="tag">世界记录</span>
         <h3>发生了什么</h3>
         <div id="log" class="log"></div>
