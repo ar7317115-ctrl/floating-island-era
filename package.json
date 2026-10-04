@@ -1,0 +1,13 @@
+{
+  "name": "floating-island-era",
+  "version": "0.1.0",
+  "private": true,
+  "description": "浮岛时代 V0.1 playable prototype",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node server/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
