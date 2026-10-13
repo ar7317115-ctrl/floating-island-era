@@ -342,6 +342,7 @@ function startExpedition(){
 }
 
 function advanceWorld(){
+  const scoutWasAlreadySpotted=!!(state.pirateScout && state.pirateScout.status==="spotted");
   for(const expedition of state.expeditions.filter(e=>e.status==="outbound")){
     expedition.progress++;
     if(expedition.progress===3){
@@ -368,7 +369,7 @@ function advanceWorld(){
       addLog("探索队安全返航："+expedition.leaderName+" 带回木材 2，以及一批补给。");
     }
   }
-  if(state.pirateScout && state.pirateScout.status==="spotted"){
+  if(scoutWasAlreadySpotted && state.pirateScout && state.pirateScout.status==="spotted"){
     state.pirateScout.turnsUntilArrival--;
     if(state.pirateScout.turnsUntilArrival<=0){
       state.pirateScout.status="nearby";
