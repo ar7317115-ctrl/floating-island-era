@@ -42,6 +42,9 @@ function newGame() {
     inventory:{characterBox:0,mysteryBox:0},
     characters:[],
     monsters:[],
+    expeditions:[],
+    distantIslands:[],
+    pirateScout:null,
     world:makeWorld(),
     protection:{stage:1,label:"绝对安全",value:100},
     log:[
@@ -62,7 +65,10 @@ function loadSavedGame() {
     if (!fs.existsSync(saveFile)) return newGame();
     const parsed = JSON.parse(fs.readFileSync(saveFile, "utf8"));
     if (!parsed || !parsed.world || !parsed.resources || !Array.isArray(parsed.characters)) return newGame();
-    parsed.version = "0.3.0";
+    parsed.version = "0.4.0";
+    parsed.expeditions = Array.isArray(parsed.expeditions) ? parsed.expeditions : [];
+    parsed.distantIslands = Array.isArray(parsed.distantIslands) ? parsed.distantIslands : [];
+    parsed.pirateScout = parsed.pirateScout || null;
     parsed.log = Array.isArray(parsed.log) ? parsed.log : [];
     parsed.log.unshift("已载入上次自动存档。");
     parsed.log = parsed.log.slice(0, 28);
@@ -313,6 +319,64 @@ function assignJob(id,job){
   updateProtection();
 }
 
+function startExpedition(){
+  if(state.expeditions.some(e=>e.status==="outbound")) throw new Error("已有探索队在外执行任务。");
+  const explorer=state.characters.find(c=>c.alive && c.job==="explorer");
+  if(!explorer) throw new Error("先招募一名人物，并把他的工作安排为“探索者”。");
+  if(state.resources.wood<2 || state.resources.water<1) throw new Error("远航准备不足，需要木材 2、淡水 1。");
+  state.resources.wood-=2;
+  state.resources.water-=1;
+  const expedition={
+    id:"expedition-"+Date.now(),
+    leaderId:explorer.instanceId,
+    leaderName:explorer.name,
+    status:"outbound",
+    progress:0,
+    destination:"未知雾区",
+    startedDay:state.day
+  };
+  state.expeditions.push(expedition);
+  state.actionCount++;
+  addLog("探索队出发："+explorer.name+" 带着补给驶入雾海。接下来继续行动，才能推进远航进度。");
+  updateProtection();
+}
+
+function advanceWorld(){
+  for(const expedition of state.expeditions.filter(e=>e.status==="outbound")){
+    expedition.progress++;
+    if(expedition.progress===3){
+      const island={
+        id:"island-"+Date.now()+"-"+Math.floor(Math.random()*10000),
+        name:state.distantIslands.length===0 ? "雾灯浮岛" : "远方浮岛 "+(state.distantIslands.length+1),
+        discoveredDay:state.day,
+        feature:Math.random()<0.5 ? "漂流木林与旧码头" : "浅水资源湾",
+        status:"未建立联系"
+      };
+      state.distantIslands.push(island);
+      expedition.destination=island.name;
+      addLog("远航发现新地点："+island.name+"。岛上可见 "+island.feature+"，但尚未建立安全航线。");
+      if(!state.pirateScout){
+        state.pirateScout={status:"spotted",turnsUntilArrival:3,name:"海盗侦察船"};
+        addLog("雾线边缘出现不明帆影。暂时判断为海盗侦察船，距离你的浮岛仍有一段距离。");
+      }
+    }
+    if(expedition.progress>=5){
+      expedition.status="returned";
+      state.resources.wood+=2;
+      if(Math.random()<0.7) state.resources.water+=2;
+      else state.resources.food+=3;
+      addLog("探索队安全返航："+expedition.leaderName+" 带回木材 2，以及一批补给。");
+    }
+  }
+  if(state.pirateScout && state.pirateScout.status==="spotted"){
+    state.pirateScout.turnsUntilArrival--;
+    if(state.pirateScout.turnsUntilArrival<=0){
+      state.pirateScout.status="nearby";
+      addLog("海盗侦察船已靠近外海，但尚未发动袭击。建议先补充资源、安排守卫并继续观察。");
+    }
+  }
+}
+
 function getPublicState(){
   state.population=1+state.characters.filter(c=>c.alive).length;
   return {
@@ -344,6 +408,7 @@ const server=http.createServer((req,res)=>{
   if(req.method==="POST" && req.url.startsWith("/api/")){
     try{
       if(req.url==="/api/fish") fish();
+      else if(req.url==="/api/expedition") startExpedition();
       else if(req.url==="/api/expand") expandIsland();
       else if(req.url==="/api/open-character") openCharacterBox();
       else if(req.url==="/api/open-mystery") openMysteryBox();
@@ -353,6 +418,7 @@ const server=http.createServer((req,res)=>{
         const parts=req.url.split("/");
         assignJob(parts[3],parts[4]);
       } else return json(res,404,{error:"未知操作。"});
+      advanceWorld();
       saveGame();
       return json(res,200,getPublicState());
     }catch(err){
@@ -362,4 +428,4 @@ const server=http.createServer((req,res)=>{
   serveStatic(req,res);
 });
 
-server.listen(PORT,()=>console.log("浮岛时代 V0.3 已启动：http://localhost:"+PORT));
+server.listen(PORT,()=>console.log("浮岛时代 V0.4 已启动：http://localhost:"+PORT));
