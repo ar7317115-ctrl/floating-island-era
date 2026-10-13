@@ -53,7 +53,38 @@ function newGame() {
   };
 }
 
-let state = newGame();
+
+const saveDir = path.join(rootDir, "save-data");
+const saveFile = path.join(saveDir, "world-save.json");
+
+function loadSavedGame() {
+  try {
+    if (!fs.existsSync(saveFile)) return newGame();
+    const parsed = JSON.parse(fs.readFileSync(saveFile, "utf8"));
+    if (!parsed || !parsed.world || !parsed.resources || !Array.isArray(parsed.characters)) return newGame();
+    parsed.version = "0.3.0";
+    parsed.log = Array.isArray(parsed.log) ? parsed.log : [];
+    parsed.log.unshift("已载入上次自动存档。");
+    parsed.log = parsed.log.slice(0, 28);
+    return parsed;
+  } catch (err) {
+    console.error("存档读取失败，已使用新世界：", err.message);
+    return newGame();
+  }
+}
+
+function saveGame() {
+  try {
+    fs.mkdirSync(saveDir, { recursive: true });
+    const tmp = saveFile + ".tmp";
+    fs.writeFileSync(tmp, JSON.stringify(state, null, 2), "utf8");
+    fs.renameSync(tmp, saveFile);
+  } catch (err) {
+    console.error("自动存档失败：", err.message);
+  }
+}
+
+let state = loadSavedGame();
 
 function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
 function addLog(text){ state.log.unshift(text); state.log=state.log.slice(0,28); }
@@ -77,6 +108,11 @@ function applySurvivalTick(multiplier=1){
 
   state.resources.food -= foodNeed;
   state.resources.water -= waterNeed;
+
+  // 食物腐败：储存棚可显著降低损耗。每次生存结算都会发生轻微腐败。
+  const spoilRate = state.buildings.storage > 0 ? 0.002 : 0.008;
+  const spoiled = Math.min(Math.max(0, state.resources.food), Math.max(0, state.resources.food) * spoilRate * multiplier);
+  state.resources.food -= spoiled;
 
   const farmOutput = state.buildings.farm * 0.28 * multiplier;
   state.resources.food += farmOutput;
@@ -317,6 +353,7 @@ const server=http.createServer((req,res)=>{
         const parts=req.url.split("/");
         assignJob(parts[3],parts[4]);
       } else return json(res,404,{error:"未知操作。"});
+      saveGame();
       return json(res,200,getPublicState());
     }catch(err){
       return json(res,400,{error:err.message,state:getPublicState()});
@@ -325,4 +362,4 @@ const server=http.createServer((req,res)=>{
   serveStatic(req,res);
 });
 
-server.listen(PORT,()=>console.log("浮岛时代 V0.2 已启动：http://localhost:"+PORT));
+server.listen(PORT,()=>console.log("浮岛时代 V0.3 已启动：http://localhost:"+PORT));
