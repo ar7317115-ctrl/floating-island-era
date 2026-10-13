@@ -60,6 +60,16 @@ function render(s){
     <div class="monster"><strong>👾 ${m.name}</strong><span>生命 ${Math.max(0,Math.round(m.hp))}/${m.maxHp} · 攻击 ${m.attack}</span></div>
   `).join("") : '<p class="hint">目前岛上没有已知怪物。</p>';
 
+  const activeExpedition=s.expeditions.find(x=>x.status==="outbound");
+  const islands=s.distantIslands.length ? s.distantIslands.map(i=>`<div class="row"><span>🏝️ ${i.name}</span><strong>${i.status}</strong></div><small class="hint">${i.feature}</small>`).join("") : '<p class="hint">雾海深处尚无已知浮岛。派出探索队，才能把未知变成地图。</p>';
+  const scout=s.pirateScout ? (s.pirateScout.status==="spotted" ? `<div class="monster"><strong>⛵ ${s.pirateScout.name}：远方发现</strong><span>预计还需 ${s.pirateScout.turnsUntilArrival} 次行动靠近。当前尚未交战。</span></div>` : `<div class="monster"><strong>⛵ ${s.pirateScout.name}：已在外海活动</strong><span>它暂未攻击。守卫与资源准备将影响后续应对。</span></div>`) : '<p class="hint">尚未发现海盗船踪迹。</p>';
+  $("#explorationPanel").innerHTML=`
+    <div class="row"><span>远航状态</span><strong>${activeExpedition ? "探索中 · "+activeExpedition.progress+"/5" : "暂无出航队伍"}</strong></div>
+    ${activeExpedition ? `<p class="hint">${activeExpedition.leaderName} 正前往 ${activeExpedition.destination}。</p>` : '<p class="hint">需要一名已分配为“探索者”的人物，以及木材 2、淡水 1。</p>'}
+    <div class="exploration-list">${islands}</div>
+    ${scout}
+  `;
+
   $("#log").innerHTML=s.log.map(x=>`<div class="log-item">${x}</div>`).join("");
   $("#protectionLabel").textContent=s.protection.label;
   $("#protectionBar").style.width=s.protection.value+"%";
